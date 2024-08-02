@@ -1,0 +1,63 @@
+.signin {
+    font-size: 1.8rem;
+    text-align: center;
+    background-color: rgb(33, 95, 33);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.signin h1 {
+    font-size: 2.5rem;
+    color: hsla(216, 100%, 90%, 0.7);
+    background-color: hsl(43, 7%, 38%);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.signin input {
+    display: block;
+    text-align: center;
+    margin: 12px auto;
+    font-size: 1.4rem;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    width: 80%;
+}
+
+.signin .input-format {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.signin button {
+    font-size: 1.6rem;
+    margin: 12px;
+    border: none;
+    cursor: pointer;
+    padding: 12px 24px;
+    color: #fff;
+    border-radius: 8px;
+}
+
+.button-login {
+    background-color: hsl(150, 70%, 50%);
+}
+
+.button-forgot {
+    background-color: hsl(200, 70%, 50%);
+}
+
+.button-login:hover {
+    background-color: hsl(150, 70%, 40%);
+    color: hsl(0, 0%, 95%);
+}
+
+.button-forgot:hover {
+    background-color: hsl(200, 70%, 40%);
+    color: hsl(0, 0%, 95%);
+}
