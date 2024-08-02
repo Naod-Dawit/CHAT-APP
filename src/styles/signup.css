@@ -1,57 +1,92 @@
-.signup h1{
-    font-size:3rem;
-    color: hsl(120, 55%, 66%);
-    background-color: hsl(43, 14%, 50%);
-    
-}
-.signup {
-  font-size: 2rem;
-  text-align: center;
-  background-color: rgb(214, 223, 214);
-  border-radius: 5px;
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
-  box-shadow: 0 4px 8px rgb(214, 14, 14);
-}
-.signup input {
-  display: block;
-  text-align: center;
-  margin: 10px;
-  font-size: 1.5rem;
-  padding: 10px;
-
-  border-radius: 15px;
-  border: 1px solid #ccc;
-  width: 80%;
-}
-.input-format {
+/* styles/signup.css */
+.signup, .signin {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
 }
-.signup button {
-  font-size: 1.6rem;
-  margin: 10px;
-  border: none;
-  cursor: pointer;
-  padding: 10px 20px;
-  color: #fff;
+
+.signup h1, .signin h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.input-format {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.input-format input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
   border-radius: 5px;
-}
-.button-create {
-  background-color: hsl(240, 69%, 72%);
-}
-.button-signin {
-  background-color: hsl(84, 83%, 47%);
+  outline: none;
+  transition: border 0.3s;
 }
 
-.button-create:hover {
-  background-color: hsla(240, 33%, 66%, 0.911);
-  color: hsl(0, 50%, 95%);
+.input-format input:focus {
+  border-color: #007bff;
 }
 
-.button-signin:hover {
-    background-color: hsl(90, 63%, 47%);
-    color: hsl(0, 50%, 95%);
+.button-create, .button-signin {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 20px;
+}
+
+.button-create:hover, .button-signin:hover {
+  background-color: #0056b3;
+}
+
+label {
+  font-size: 1rem;
+  color: #333;
+  margin-top: 10px;
+}
+
+input[type="file"] {
+  margin-top: 10px;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 600px) {
+  .signup, .signin {
+    padding: 10px;
   }
+
+  .signup h1, .signin h1 {
+    font-size: 1.5rem;
+  }
+
+  .input-format {
+    width: 100%;
+  }
+
+  .button-create, .button-signin {
+    width: 100%;
+  }
+}

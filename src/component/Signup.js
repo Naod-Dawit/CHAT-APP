@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Firebase Storage methods
 
-import '../styles/signup.css';
+import "../styles/signup.css";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ const Signup = () => {
     age: "",
   });
   const [avatar, setAvatar] = useState(null);
+    const [error, setError] = useState(""); 
 
   const handleInputs = (e) => {
     const { name, value } = e.target;
@@ -53,12 +54,13 @@ const Signup = () => {
         email: data.email,
         name: data.name,
         age: data.age,
-        avatar: avatarURL, 
+        avatar: avatarURL,
       });
 
       alert("Account created successfully");
-      navigate('/userpage')
+      navigate("/userpage");
     } catch (error) {
+      setError(error.message);
       console.error("Error signing up:", error);
     }
   };
@@ -98,14 +100,12 @@ const Signup = () => {
           onChange={handleInputs}
         />
         <label>Profile picture</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleAvatarChange}
-        />
+        <input type="file" accept="image/*" onChange={handleAvatarChange} />
       </div>
-      <button className='button-signin' onClick={() => navigate("/")}>SIGN IN</button>
-      <button className="button-create" onClick={handleSignUp}>Create Account</button>
+      {error && <div className="error-message">{error}</div>} {/* Display error message */}
+      <button className="button-create" onClick={handleSignUp}>
+        Create Account
+      </button>
     </div>
   );
 };

@@ -81,9 +81,7 @@ const Auth = () => {
           />
         </div>
 
-        <button className="button-create" onClick={() => navigate("/")}>
-          JOIN NOW
-        </button>
+     
         <button className="button-signin" onClick={handleSignIn}>
           SIGN IN
         </button>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db, auth, updateUserStatus, realTimeDb } from "../firebaseconfig";
 import { collection, getDocs } from "firebase/firestore";
-import { onAuthStateChanged,signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import ChatSection from "./ChatSection";
 import "../styles/chats.css";
@@ -18,12 +18,10 @@ const ChatPage = () => {
   const [searchTarget, setSearchTarget] = useState("");
   const [blockedUsers, setBlockedUsers] = useState([]);
 
-
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        fetchUsers();
       } else {
         navigate("/");
       }
@@ -32,45 +30,41 @@ const ChatPage = () => {
     return () => unsubscribeAuth();
   }, [navigate]);
 
-  const fetchUsers = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const usersList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setUsers(usersList);
-      
+  useEffect(() => {
+    let isMounted = true;
 
-      const currentUser = usersList.find(
-        (user) => user.userId === auth.currentUser?.uid
-      );
-      const currentUseravatar = currentUser.avatar;
-      setAvatar(currentUseravatar);
-
-      if (currentUser) {
-        setCurrentUser(currentUser.name);
-      }
-
-
-      usersList.forEach((user) => {
-        
-        const statusRef = ref(realTimeDb, `status/${user.userId}`);
-        onValue(statusRef, (snapshot) => {
-          const status = snapshot.val();
-          user.online = status?.online || false;
-          setUsers([...usersList]);
-          
-          
+    const fetchStatus = async () => {
+      if (!isMounted) return;
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const usersList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        usersList.forEach((user) => {
+          const statusRef = ref(realTimeDb, `status/${user.userId}`);
+          onValue(statusRef, (snapshot) => {
+            const status = snapshot.val();
+            user.online = status?.online || false;
+            setUsers([...usersList]);
+          });
         });
-      });
-      console.log(usersList);
-      
-      
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
+      } catch (error) {
+        console.error("Error fetching user status:", error);
+      }
+    };
+
+    const fetchStatusPeriodically = () => {
+      fetchStatus();
+      setTimeout(fetchStatusPeriodically, 5000);
+    };
+
+    fetchStatusPeriodically();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const filteredUsers = users
     .filter((u) => u.userId !== auth.currentUser?.uid)
@@ -100,7 +94,7 @@ const ChatPage = () => {
     try {
       if (auth.currentUser) {
         await updateUserStatus(auth.currentUser.uid, false);
-        alert("Logged out Successfully")
+        alert("Logged out Successfully");
       }
       await signOut(auth);
     } catch (error) {
@@ -158,14 +152,9 @@ const ChatPage = () => {
         <h1 style={{ textAlign: "center" }}>{currentUser}</h1>
       </div>
 
-
-
-
-
-
       <button className="sign-out-button" onClick={handleSignOut}>
-          Sign out
-        </button>
+        Sign out
+      </button>
     </div>
   );
 };
