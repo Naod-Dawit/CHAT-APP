@@ -85,7 +85,9 @@ const Auth = () => {
         <button className="button-signin" onClick={handleSignIn}>
           SIGN IN
         </button>
+      {error && <div className="error-message">{error}</div>} {/* Display error message */}
       </div>
+
     </>
   );
 };

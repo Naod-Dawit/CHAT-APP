@@ -5,7 +5,6 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import ChatSection from "./ChatSection";
 import "../styles/chats.css";
-
 import { ref, onValue } from "firebase/database";
 
 const ChatPage = () => {
@@ -13,15 +12,17 @@ const ChatPage = () => {
   const [user, setUser] = useState(null);
   const [recipientId, setRecipientId] = useState("");
   const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
   const [Avatar, setAvatar] = useState("");
   const [searchTarget, setSearchTarget] = useState("");
   const [blockedUsers, setBlockedUsers] = useState([]);
+
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
+        fetchCurrentUser(currentUser.uid);
       } else {
         navigate("/");
       }
@@ -29,6 +30,25 @@ const ChatPage = () => {
 
     return () => unsubscribeAuth();
   }, [navigate]);
+
+  const fetchCurrentUser = async (userId) => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const usersList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      const currentUserData = usersList.find((user) => user.userId === userId);
+      if (currentUserData) {
+        setCurrentUser(currentUserData);
+      }
+    } catch (error) {
+      console.error("Error fetching current user data:", error);
+    }
+  };
+
+
+
 
   useEffect(() => {
     let isMounted = true;
@@ -144,12 +164,12 @@ const ChatPage = () => {
 
       <div className="current-user-info">
         <h1 style={{ textAlign: "center" }}>About Me</h1>
-        {Avatar ? (
-          <img src={Avatar} alt="Current User Avatar" className="avatar-me" />
+        {currentUser?.avatar ? (
+          <img src={currentUser.avatar} alt="Current User Avatar" className="avatar-me" />
         ) : (
           <div className="avatar-placeholder">No Avatar</div>
         )}
-        <h1 style={{ textAlign: "center" }}>{currentUser}</h1>
+        <h1 style={{ textAlign: "center" }}>{currentUser?.name}</h1>
       </div>
 
       <button className="sign-out-button" onClick={handleSignOut}>

@@ -16,7 +16,7 @@ const Signup = () => {
     age: "",
   });
   const [avatar, setAvatar] = useState(null);
-    const [error, setError] = useState(""); 
+  const [error, setError] = useState("");
 
   const handleInputs = (e) => {
     const { name, value } = e.target;
@@ -102,7 +102,7 @@ const Signup = () => {
         <label>Profile picture</label>
         <input type="file" accept="image/*" onChange={handleAvatarChange} />
       </div>
-      {error && <div className="error-message">{error}</div>} {/* Display error message */}
+      {error && <div className="error-message">{error}</div>}
       <button className="button-create" onClick={handleSignUp}>
         Create Account
       </button>
