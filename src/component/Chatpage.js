@@ -18,7 +18,6 @@ import { ref, onValue } from "firebase/database";
 import ChatSection from "./ChatSection";
 import "../styles/chats.css";
 import { Triangle } from "react-loader-spinner";
-import VideoCall from "./Videocall";
 
 const ChatPage = () => {
   const navigate = useNavigate();
@@ -29,8 +28,8 @@ const ChatPage = () => {
   const [newAvatar, setnewAvatar] = useState("");
   const [searchTarget, setSearchTarget] = useState("");
   const [loading, setloading] = useState(false);
+
   const [showAvatarUpload, setShowAvatarUpload] = useState(false);
-  const [showVideoCall, setShowVideoCall] = useState(false);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -157,7 +156,8 @@ const ChatPage = () => {
       await updateDoc(userDoc, { avatar: avatarURL });
       setCurrentUser({ ...currentUser, avatar: avatarURL });
       alert("Avatar updated successfully!");
-      setShowAvatarUpload(false);
+      setShowAvatarUpload(false)
+
     } catch (error) {
       alert("Error uploading avatar:", error);
     } finally {
@@ -166,96 +166,86 @@ const ChatPage = () => {
   };
 
   const handleloader = () => {
-    setShowAvatarUpload((prevState) => !prevState);
-  };
-
-  const handleVideoCall = () => {
-    setShowVideoCall(true);
+    setShowAvatarUpload((prevState) => !prevState); 
   };
 
   return (
+
     <>
-      <div className="chat-page">
-        <div className="users-list">
-          <label>CHATS </label>
-          <input
-            type="text"
-            placeholder="Search"
-            onChange={(e) => setSearchTarget(e.target.value)}
-          />
-          {filteredUsers.map((user) => (
-            <div
-              key={user.id}
-              className={`chats-box ${
-                recipientId === user.userId ? "selected" : ""
-              }`}
-              onClick={() => setRecipientId(user.userId)}
-            >
-              <div className="avatar-container">
-                {user.online && <div className="online-status-bubble"></div>}
-                {user.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="avatar" />
-                ) : (
-                  <div className="avatar-placeholder">No Image</div>
-                )}
-              </div>
-              <span className="user-name">{user.name}</span>
+    <div className="chat-page">
+      <div className="users-list">
+        <label>CHATS </label>
+        <input
+          type="text"
+          placeholder="Search"
+          onChange={(e) => setSearchTarget(e.target.value)}
+        />
+        {filteredUsers.map((user) => (
+          <div
+            key={user.id}
+            className={`chats-box ${
+              recipientId === user.userId ? "selected" : ""
+            }`}
+            onClick={() => setRecipientId(user.userId)}
+          >
+            <div className="avatar-container">
+              {user.online && <div className="online-status-bubble"></div>}
+              {user.avatar ? (
+                <img src={user.avatar} alt={user.name} className="avatar" />
+              ) : (
+                <div className="avatar-placeholder">No Image</div>
+              )}
             </div>
-          ))}
-        </div>
-        <div className="chat-section-container">
-          {recipientId && (
-            <ChatSection
-              recipientId={recipientId}
-              setRecipientId={setRecipientId}
-              currentUser={user}
-              users={users}
-            />
-          )}
-          {recipientId && currentUser && (
-            <button onClick={handleVideoCall}>Call</button>
-          )}
-          {showVideoCall && (
-            <VideoCall recipientId={recipientId} currentUser={currentUser} />
-          )}
-        </div>
-        <div className="current-user-info">
-          <h1 style={{ textAlign: "center" }}>About Me</h1>
-          {currentUser?.avatar ? (
-            <img
-              src={currentUser.avatar}
-              alt="Current User Avatar"
-              className="avatar-me"
-              onClick={handleloader}
-            />
-          ) : (
-            <div className="avatar-placeholder">No Avatar</div>
-          )}
-          <br />
-          {showAvatarUpload && (
-            <>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarChange}
-              />
-              <button onClick={handleAvatarUpload}>Update Avatar</button>
-            </>
-          )}
-          <h1 style={{ textAlign: "center" }}>{currentUser?.name}</h1>
-          {loading && (
-            <div className="spinner-loader">
-              <Triangle
-                strokeColor="grey"
-                strokeWidth="5"
-                animationDuration="0.75"
-                width="50"
-                visible={true}
-              />
-            </div>
-          )}
-        </div>
+            <span className="user-name">{user.name}</span>
+          </div>
+        ))}
       </div>
+      <div className="chat-section-container">
+        {recipientId && (
+          <ChatSection
+            recipientId={recipientId}
+            setRecipientId={setRecipientId}
+            currentUser={user}
+            users={users}
+          />
+        )}
+      </div>
+
+      <div className="current-user-info">
+        <h1 style={{ textAlign: "center" }}>About Me</h1>
+        {currentUser?.avatar ? (
+          <img
+            src={currentUser.avatar}
+            alt="Current User Avatar"
+            className="avatar-me"
+            onClick={handleloader}
+          />
+        ) : (
+          <div className="avatar-placeholder">No Avatar</div>
+        )}
+        <br/>
+        {showAvatarUpload && (
+          <>
+            <input type="file" accept="image/*" onChange={handleAvatarChange} />
+            <button onClick={handleAvatarUpload}>Update Avatar</button>
+          </>
+        )}
+
+        <h1 style={{ textAlign: "center" }}>{currentUser?.name}</h1>
+        {loading&& (
+          <div className="spinner-loader">
+            <Triangle
+              strokeColor="grey"
+              strokeWidth="5"
+              animationDuration="0.75"
+              width="50"
+              visible={true}
+            />
+          </div>
+        )}
+      </div>
+
+    </div>
       <button className="sign-out-button" onClick={handleSignOut}>
         Sign out
       </button>
