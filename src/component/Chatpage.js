@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { db, auth, updateUserStatus, realTimeDb, storage } from "../firebaseconfig";
+import {
+  db,
+  auth,
+  updateUserStatus,
+  realTimeDb,
+  storage,
+} from "../firebaseconfig";
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { getDownloadURL, uploadBytes, ref as storageRef } from "firebase/storage";
+import {
+  getDownloadURL,
+  uploadBytes,
+  ref as storageRef,
+} from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { ref, onValue } from "firebase/database";
 import ChatSection from "./ChatSection";
 import "../styles/chats.css";
+import { Triangle } from "react-loader-spinner";
 
 const ChatPage = () => {
   const navigate = useNavigate();
@@ -16,25 +27,23 @@ const ChatPage = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [newAvatar, setnewAvatar] = useState("");
   const [searchTarget, setSearchTarget] = useState("");
+  const [loading, setloading] = useState(false);
+
+  const [showAvatarUpload, setShowAvatarUpload] = useState(false);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         fetchCurrentUser(currentUser.uid);
-        
       } else {
         navigate("/");
       }
     });
 
-
     return () => unsubscribeAuth();
   }, [navigate]);
 
-  
-  
-  
   const fetchCurrentUser = async (userId) => {
     try {
       const querySnapshot = await getDocs(collection(db, "users"));
@@ -45,7 +54,6 @@ const ChatPage = () => {
       const currentUserData = usersList.find((user) => user.userId === userId);
       if (currentUserData) {
         setCurrentUser(currentUserData);
-        
       }
     } catch (error) {
       console.error("Error fetching current user data:", error);
@@ -131,25 +139,39 @@ const ChatPage = () => {
   };
 
   const uploadAvatar = async (file) => {
-    const storageReference = storageRef(storage, `avatars/${Date.now()}_${file.name}`);
+    const storageReference = storageRef(
+      storage,
+      `avatars/${Date.now()}_${file.name}`
+    );
     await uploadBytes(storageReference, file);
     return getDownloadURL(storageReference);
   };
 
-  
   const handleAvatarUpload = async () => {
+    setloading(true);
+
     try {
       const avatarURL = await uploadAvatar(newAvatar);
       const userDoc = doc(db, "users", currentUser.id);
       await updateDoc(userDoc, { avatar: avatarURL });
       setCurrentUser({ ...currentUser, avatar: avatarURL });
       alert("Avatar updated successfully!");
+      setShowAvatarUpload(false)
+
     } catch (error) {
-      console.error("Error uploading avatar:", error);
+      alert("Error uploading avatar:", error);
+    } finally {
+      setloading(false);
     }
   };
 
+  const handleloader = () => {
+    setShowAvatarUpload((prevState) => !prevState); 
+  };
+
   return (
+
+    <>
     <div className="chat-page">
       <div className="users-list">
         <label>CHATS </label>
@@ -196,19 +218,38 @@ const ChatPage = () => {
             src={currentUser.avatar}
             alt="Current User Avatar"
             className="avatar-me"
+            onClick={handleloader}
           />
         ) : (
           <div className="avatar-placeholder">No Avatar</div>
         )}
+        <br/>
+        {showAvatarUpload && (
+          <>
+            <input type="file" accept="image/*" onChange={handleAvatarChange} />
+            <button onClick={handleAvatarUpload}>Update Avatar</button>
+          </>
+        )}
+
         <h1 style={{ textAlign: "center" }}>{currentUser?.name}</h1>
-        <input type="file" accept="image/*" onChange={handleAvatarChange} />
-        <button onClick={handleAvatarUpload}>Update Avatar</button>
+        {loading&& (
+          <div className="spinner-loader">
+            <Triangle
+              strokeColor="grey"
+              strokeWidth="5"
+              animationDuration="0.75"
+              width="50"
+              visible={true}
+            />
+          </div>
+        )}
       </div>
 
+    </div>
       <button className="sign-out-button" onClick={handleSignOut}>
         Sign out
       </button>
-    </div>
+    </>
   );
 };
 
