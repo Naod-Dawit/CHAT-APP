@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { db, auth, updateUserStatus, realTimeDb } from "../firebaseconfig";
-import { collection, getDocs } from "firebase/firestore";
+import { db, auth, updateUserStatus, realTimeDb, storage } from "../firebaseconfig";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { getDownloadURL, uploadBytes, ref as storageRef } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
+import { ref, onValue } from "firebase/database";
 import ChatSection from "./ChatSection";
 import "../styles/chats.css";
-import { ref, onValue } from "firebase/database";
 
 const ChatPage = () => {
   const navigate = useNavigate();
@@ -13,24 +14,27 @@ const ChatPage = () => {
   const [recipientId, setRecipientId] = useState("");
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
-  const [Avatar, setAvatar] = useState("");
+  const [newAvatar, setnewAvatar] = useState("");
   const [searchTarget, setSearchTarget] = useState("");
-  const [blockedUsers, setBlockedUsers] = useState([]);
-
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         fetchCurrentUser(currentUser.uid);
+        
       } else {
         navigate("/");
       }
     });
 
+
     return () => unsubscribeAuth();
   }, [navigate]);
 
+  
+  
+  
   const fetchCurrentUser = async (userId) => {
     try {
       const querySnapshot = await getDocs(collection(db, "users"));
@@ -41,14 +45,12 @@ const ChatPage = () => {
       const currentUserData = usersList.find((user) => user.userId === userId);
       if (currentUserData) {
         setCurrentUser(currentUserData);
+        
       }
     } catch (error) {
       console.error("Error fetching current user data:", error);
     }
   };
-
-
-
 
   useEffect(() => {
     let isMounted = true;
@@ -122,6 +124,31 @@ const ChatPage = () => {
     }
   };
 
+  const handleAvatarChange = (e) => {
+    if (e.target.files[0]) {
+      setnewAvatar(e.target.files[0]);
+    }
+  };
+
+  const uploadAvatar = async (file) => {
+    const storageReference = storageRef(storage, `avatars/${Date.now()}_${file.name}`);
+    await uploadBytes(storageReference, file);
+    return getDownloadURL(storageReference);
+  };
+
+  
+  const handleAvatarUpload = async () => {
+    try {
+      const avatarURL = await uploadAvatar(newAvatar);
+      const userDoc = doc(db, "users", currentUser.id);
+      await updateDoc(userDoc, { avatar: avatarURL });
+      setCurrentUser({ ...currentUser, avatar: avatarURL });
+      alert("Avatar updated successfully!");
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+    }
+  };
+
   return (
     <div className="chat-page">
       <div className="users-list">
@@ -165,11 +192,17 @@ const ChatPage = () => {
       <div className="current-user-info">
         <h1 style={{ textAlign: "center" }}>About Me</h1>
         {currentUser?.avatar ? (
-          <img src={currentUser.avatar} alt="Current User Avatar" className="avatar-me" />
+          <img
+            src={currentUser.avatar}
+            alt="Current User Avatar"
+            className="avatar-me"
+          />
         ) : (
           <div className="avatar-placeholder">No Avatar</div>
         )}
         <h1 style={{ textAlign: "center" }}>{currentUser?.name}</h1>
+        <input type="file" accept="image/*" onChange={handleAvatarChange} />
+        <button onClick={handleAvatarUpload}>Update Avatar</button>
       </div>
 
       <button className="sign-out-button" onClick={handleSignOut}>
