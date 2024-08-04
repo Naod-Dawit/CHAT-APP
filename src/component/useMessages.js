@@ -15,7 +15,7 @@ const useMessages = (recipientId, currentUser) => {
       });
       return unsubscribe;
     };
-
+    
     const fetchCurrentUserName = async () => {
       const querySnapshot = await getDocs(collection(db, "users"));
       const usersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -34,7 +34,7 @@ const useMessages = (recipientId, currentUser) => {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
-
+  
   const sendMessage = async (newMessage) => {
     if (currentUser && newMessage.trim() !== "" && recipientId.trim() !== "") {
       await addDoc(collection(db, "messages"), {
