@@ -245,9 +245,6 @@ const ChatPage = () => {
         )}
       </div>
 
-   {/*    <VideoCall/>
-
- */}
     </div>
       <button className="sign-out-button" onClick={handleSignOut}>
         Sign out
