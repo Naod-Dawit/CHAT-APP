@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import useMessages from "./useMessages";
 import { uploadFile } from "./Uploadfiles";
-import { auth, updateUserStatus } from "../firebaseconfig";
+import { auth } from "../firebaseconfig";
 import "../styles/chats.css";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { renderFilePreview } from "./Uploadfiles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPaperclip,
+  faPaperPlane,
+  faVideo,
+} from "@fortawesome/free-solid-svg-icons";
+import VideoCall from "./Vidoecall"; 
 
 const ChatSection = ({ recipientId, setRecipientId, currentUser, users }) => {
   const navigate = useNavigate();
@@ -25,6 +31,7 @@ const ChatSection = ({ recipientId, setRecipientId, currentUser, users }) => {
       setSelectedFile(e.target.files[0]);
     }
   };
+
   const handleSendfile = async () => {
     if (selectedFile) {
       try {
@@ -81,7 +88,7 @@ const ChatSection = ({ recipientId, setRecipientId, currentUser, users }) => {
           onClick={() => setShowAttachments(!showAttachments)}
           style={{ cursor: "pointer" }}
         >
-          <FontAwesomeIcon icon="fa-solid fa-paperclip" fade />
+          <FontAwesomeIcon icon={faPaperclip} />
         </div>
         <input
           id="attachments"
@@ -99,12 +106,9 @@ const ChatSection = ({ recipientId, setRecipientId, currentUser, users }) => {
             handleSendfile();
           }}
         >
-          <FontAwesomeIcon
-            icon="fa-regular fa-paper-plane"
-            bounce
-            style={{ color: "#74C0FC" }}
-          />
+          <FontAwesomeIcon icon={faPaperPlane} style={{ color: "#74C0FC" }} />
         </button>
+        <VideoCall recipientId={recipientId} />
       </div>
     </div>
   );
